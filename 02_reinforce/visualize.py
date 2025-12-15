@@ -3,10 +3,10 @@ import torch
 import time
 from policy import PolicyNetwork
 
-def visualize():
+def visualize() -> None:
     env = gym.make("CartPole-v1", render_mode="human")
-    obs_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.n
+    obs_dim = env.observation_space.shape[0] # type: ignore
+    action_dim = env.action_space.n # type: ignore
     
     policy = PolicyNetwork(obs_dim, action_dim)
     
@@ -22,14 +22,14 @@ def visualize():
     
     for episode in range(5):
         state, _ = env.reset()
-        total_reward = 0
+        total_reward: float = 0.0
         terminated = False
         truncated = False
         
         while not (terminated or truncated):
             action, _ = policy.get_action(state)
             state, reward, terminated, truncated, _ = env.step(action)
-            total_reward += reward
+            total_reward += float(reward)
             time.sleep(0.02) # Slow down slightly
             
         print(f"Episode {episode+1}: Total Reward: {total_reward}")
