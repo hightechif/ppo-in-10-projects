@@ -2,4 +2,4 @@ gymnasium[classic_control]
 torch
 numpy
 pybullet
-pygame
+pygame-ce
