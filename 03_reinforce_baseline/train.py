@@ -4,12 +4,13 @@ import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 from collections import deque
+from typing import List, Any
 from models import PolicyNetwork, ValueNetwork
 
-def train():
+def train() -> None:
     env = gym.make("CartPole-v1")
-    obs_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.n
+    obs_dim = env.observation_space.shape[0] # type: ignore
+    action_dim = env.action_space.n # type: ignore
     
     policy = PolicyNetwork(obs_dim, action_dim)
     value_net = ValueNetwork(obs_dim)
@@ -21,11 +22,11 @@ def train():
     gamma = 0.99
     print_every = 50
     
-    scores_deque = deque(maxlen=100)
+    scores_deque: deque[float] = deque(maxlen=100)
     
     for i_episode in range(1, n_episodes + 1):
         saved_log_probs = []
-        rewards = []
+        rewards: List[float] = []
         states = []
         state, _ = env.reset()
         
@@ -34,28 +35,28 @@ def train():
             action, log_prob = policy.get_action(state)
             saved_log_probs.append(log_prob)
             state, reward, terminated, truncated, _ = env.step(action)
-            rewards.append(reward)
+            rewards.append(float(reward))
             if terminated or truncated:
                 break
                 
         scores_deque.append(sum(rewards))
         
         # Calculate Returns
-        returns = []
-        R = 0
+        returns: List[float] = []
+        R: float = 0.0
         for r in reversed(rewards):
             R = r + gamma * R
             returns.insert(0, R)
             
-        returns = torch.tensor(returns)
-        returns = (returns - returns.mean()) / (returns.std() + 1e-9)
+        returns_tensor = torch.tensor(returns)
+        returns_tensor = (returns_tensor - returns_tensor.mean()) / (returns_tensor.std() + 1e-9)
         
         # Update Value Network and Calculate Advantage
         states_tensor = torch.tensor(np.array(states), dtype=torch.float32)
         values = value_net(states_tensor).squeeze()
         
         # Value Loss (MSE)
-        value_loss = F.mse_loss(values, returns)
+        value_loss = F.mse_loss(values, returns_tensor)
         
         value_optimizer.zero_grad()
         value_loss.backward()
@@ -65,7 +66,7 @@ def train():
         # Or simply use the value computed before update.
         # Advantage = Return - Value
         # Note: We detach values because we don't want to backprop through value_net here
-        advantages = returns - values.detach()
+        advantages = returns_tensor - values.detach()
         
         # Update Policy Network
         policy_loss = []
@@ -73,8 +74,8 @@ def train():
             policy_loss.append(-log_prob * adv)
             
         policy_optimizer.zero_grad()
-        policy_loss = torch.cat(policy_loss).sum()
-        policy_loss.backward()
+        policy_loss_tensor = torch.cat(policy_loss).sum()
+        policy_loss_tensor.backward()
         policy_optimizer.step()
         
         if i_episode % print_every == 0:
