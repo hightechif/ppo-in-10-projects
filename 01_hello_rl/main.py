@@ -1,7 +1,8 @@
 import gymnasium as gym
 import time
+from typing import Any
 
-def main():
+def main() -> None:
     print("Initializing CartPole-v1...")
     # Create the environment. 'render_mode="human"' will open a window.
     # Use 'render_mode="rgb_array"' if you want to capture frames without a window.
@@ -18,14 +19,14 @@ def main():
     print(f"Action Space: {env.action_space}")
     print("Starting simulation for 100 steps...")
 
-    total_reward = 0
+    total_reward: float = 0.0
     for step in range(100):
         # Sample a random action
         action = env.action_space.sample()
 
         # Step the environment
         observation, reward, terminated, truncated, info = env.step(action)
-        total_reward += reward
+        total_reward += float(reward)
 
         # Render is handled by the environment in 'human' mode automatically
         # Just adding a small sleep so it's not too fast for the user to see
