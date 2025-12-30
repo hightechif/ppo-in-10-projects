@@ -1,0 +1,13 @@
+[project]
+name = "ppo-in-10-projects"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "gymnasium[classic-control]>=1.2.3",
+    "numpy>=2.4.0",
+    "pybullet>=3.2.7",
+    "pygame-ce>=2.5.6",
+    "torch>=2.9.1",
+]
